@@ -1,0 +1,182 @@
+http://paginapessoal.utfpr.edu.br/lincolnh/disciplinas/sistel/redes-de-acesso/aulas/index.html/ComandosBasicosCisco.pdf
+
+Para conectar em um router ou switch CISCO utilize as seguintes opções:
+Utilize softwares de comunicação serial ex:
+Hyperterminal
+Putty
+screen
+Com as seguintes opções:
+Velocidade: 9600
+Bits de dados: 8
+Paridade: Nenhum
+Bit de Parada: 1
+Controle de Fluxo: Nenhum
+Conectar modo console no Linux:
+
+Caso seu equipamento esteja configurado, será necessário restaurar a configuração de fábrica, quando o equipamento está sem senha:
+
+Resetar a configuração de fábrica:
+>enable
+#conf term
+(config)
+#config-register 0x2142
+^Z
+#reload
+responda [no]
+[confirm] apenas dê <enter>
+quando der o boot novamente, responda [no]
+>enable
+#conf term
+(config)
+#config-register 0x2102
+(config)
+#exit
+>wr
+Confira se está para dar boot no endereço: 0x2102
+#show version
+
+Caso seu equipamento esteja com senha será necessário resetar a senha com o seguinte procedimento:
+- Deixe o computador conectado na serial do equipamento. Desligue e ligue o equipamento.
+- Entre no modo Rommon: Após 5 segundos aproximadamente, pressionar simultaneamente as teclas ctrl + break.Este procedimento interrompe a sequência normal do boot e inicia o Rom Monitor, no prompt:
+rommon 1>
+#confreg 0×2142
+rommon 2>
+#reset
+Siga o procedimento para restaurar as configurações de fábrica.
+
+##### Comandos Básicos #####
+Comandos Básicos de Roteadores Cisco.
+Resetar as configurações:
+>enable
+R1#erase startup-config
+[confirm] apenas dê <enter>
+R1#reload
+System configuration has been modified. Save? [yes/no]: yes
+Proceed with reload? [confirm] apenas dê <enter>
+Would you like to enter the initial configuration dialog? [yes/no]: no <digito no e de enter>
+Configurando um nome.
+Router>enable
+Router#configure terminal
+Router(config)#hostname R1
+R1#
+Configurando senha enable.
+Router>enable
+Router#configure terminal
+Router(config)#enable password ti-redes
+Configurando senha enable secret.
+Router>enable
+Router#configure terminal
+Router(config)#enable secret ti-redes
+Configurando senha da console.
+Router>enable
+Router#configure terminal
+Router(config)#line console 0
+Router(config-line)#password ti-redes
+Configurando acesso telnet para 05 usuários.
+Router>enable
+Router#configure terminal
+Router(config)#line vty 0 4
+Router(config-line)#login
+Router(config-line)#password ti-redes
+Configurando IP na interface ethernet.
+Router>enable
+Router#configure terminal
+Router(config)#interface ethernet 0/1
+Router(config-if)#ip address 192.168.1.1 255.255.255.0
+Router(config-if)#no shutdown
+Configurando IP na interface fastethernet.
+Router>enable
+Router#configure terminal
+Router(config)#interface fastEthernet 0/1
+Router(config-if)#ip address 192.168.1.1 255.255.255.0
+Router(config-if)#no shutdown
+Configurando IP na interface serial.
+Router>enable
+Router#configure terminal
+Router(config)#interface serial 0/1/0
+Router(config-if)#ip address 192.168.1.1 255.255.255.0
+Router(config-if)#clock rate 128000 (somente se a serial for DCE)
+Router(config-if)#no shutdown
+2
+Configuração de Roteamento
+Configurando uma rota default por ip do próximo salto.
+Router#configure terminal
+Router(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1
+Configurando rota default por interface.
+Router#configure terminal
+Router(config)#ip route 0.0.0.0 0.0.0.0 serial 0/1/0
+Configurando rota estática por ip do próximo salto.
+Router#configure terminal
+Router(config)#ip route 192.168.0.0 255.255.255.0 192.168.1.1
+Configurando rota estática por interface.
+Router#configure terminal
+Router(config)#ip route 192.168.0.0 255.255.255.0 serial 0/0
+Configurando roteamento entre vlans.
+Router>enable
+Router#configure terminal
+Router(config)#interface fastEthernet 0/1
+Router(config-if)#no shutdown
+Router(config-if)#exit
+Router(config)#interface fastEthernet 0/0.1 (ID da sub-interface)
+Router(config-subif)#encapsulation dot1Q 10 (ID da vlan)
+Router(config-subif)#ip address 192.168.1.1 255.255.255.0
+Router(config-subif)#exit
+Router(config)#interface fastEthernet 0/0.2 (ID da sub-interface)
+Router(config-subif)#encapsulation dot1Q 20 (ID da vlan)
+Router(config-subif)#ip address 192.168.2.1 255.255.255.0
+Configurando roteamento RIP v1.
+Router#
+configure terminal
+Router(config)#router rip
+Router(config-router)#network 192.168.1.0
+Router(config-router)#network 10.0.0.0
+Configuração do protocolo de roteamento dinâmico OSPF
+Configuração da rota
+router # conf term
+router (config) # router ospf area 1
+router (config-router) # network 10.0.0.0 0.0.0.255 area
+router (config-router) # network 172.16.0.0 0.0.255.255 area 0
+<ctrl> <z>
+router # wr
+Configuração do protocolo PPP
+Configuração da interface serial
+router # conf term
+router (config) # in s2/0
+router (config-if) # ip add <endereço IP> <máscara>
+router (config-if) # encap ppp
+router (config-if) # clock rate 1000000 (somente na interface DCE)
+router (config-if) # no shutdown
+<ctrl> <z>
+router # wr
+3
+Configuração de DHCP
+Configuração do DHCP local
+router > enable
+router # conf term
+router (config) # ip dhcp pool iplocal
+router(dhcp-config) # network 192.168.5.0 255.255.255.0
+router(dhcp-config) # dns-server 8.8.8.8
+router(dhcp-config) # default-router 192.168.5.1
+router(dhcp-config) # exit
+router(config) # ip dhcp excluded-address 192.168.5.1 192.168.5.10
+<ctrl> <z>
+router # wr
+Comandos de verificação e diagnóstico.
+Router#show ?
+(O comando show ? fornece uma lista dos comandos show disponíveis)
+Router#show arp
+(Exibe a tabela ARP do roteador)
+Router#sh interfaces
+(Verifica detalhadamente as configurações das interfaces)
+Router#sh ip interface brief
+(Verifica resumidamente as configurações das interfaces)
+Router#sh ip route
+(Verifica a tabela de roteamento)
+Router#sh running-config
+(Verifica as configirações ativas na RAM)
+Router#sh startup-config
+(Verifica as configurações da NVRAM)
+Router#sh flash:
+(Verifica os arquivos de sistema operacional da Flash)
+Router#copy running-config startup-config
+(Salva as configurações ativas na RAM para a NVRAM) 
